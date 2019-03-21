@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  build:
+      image: ticket-checker-server-build:1.0
+      container_name: ticket-checker-server-build
+      entrypoint:
+        - "true"
+      build:
+        context: .
+        target: build
