@@ -1,0 +1,9 @@
+target/
+idea/
+
+*.sh
+.Dockerignore
+.gitignore
+docker-compose.yml
+docker-compose-build.yml
+Dockerfile
