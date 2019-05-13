@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Optional;
 
-/**
- * @author Daniel Incicau, daniel.incicau@busymachines.com
- * @since 01/04/2019
- */
 @Component
 public class AuthUtil {
 

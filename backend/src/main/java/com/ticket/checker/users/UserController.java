@@ -1,91 +1,49 @@
-package com.ticket.checker.ticketchecker.users;
+package com.ticket.checker.users;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-import javax.validation.Valid;
-
+import com.ticket.checker.exceptions.ForbiddenException;
+import com.ticket.checker.exceptions.InvalidInputException;
+import com.ticket.checker.exceptions.NotFoundException;
+import com.ticket.checker.security.SpringSecurityConfig;
+import com.ticket.checker.tickets.Ticket;
+import com.ticket.checker.utils.AuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.ticket.checker.ticketchecker.exceptions.ResourceNotFoundException;
-import com.ticket.checker.ticketchecker.exceptions.UnauthorizedRequestException;
-import com.ticket.checker.ticketchecker.exceptions.UsernameExistsException;
-import com.ticket.checker.ticketchecker.security.SpringSecurityConfig;
-import com.ticket.checker.ticketchecker.tickets.Ticket;
-import com.ticket.checker.ticketchecker.tickets.TicketController;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
-	private UserUtil util;
-	
-	@Value("${ticket.checker.application.name:Ticket Checker}")
+	private AuthUtil authUtil;
+
+	@Value("${application.name:Ticket Checker}")
 	private String appName;
 
-	@Value("${ticket.checker.admin.username:admin}")
-	private String adminUsername;
-
-	@Value("${ticket.checker.admin.password:admin}")
-	private String adminPassword;
-
-	@PostConstruct
-	public void init(){
-		Optional<User> maybeUser = userRepository.findByUsername(adminUsername);
-		if(!maybeUser.isPresent()) {
-			try {
-				User user = new User();
-				user.setCreatedAt(new Date());
-
-				String sha256EncryptedPass = util.encryptSha256(adminPassword);
-				String hashedUserPassword = SpringSecurityConfig.encoder().encode(sha256EncryptedPass);
-
-				user.setUsername(adminUsername);
-				user.setPassword(hashedUserPassword);
-				user.setSoldTicketsNo(0);
-				user.setValidatedTicketsNo(0);
-				user.setName("Administrator");
-				user.setRole("ROLE_" + SpringSecurityConfig.ADMIN);
-				userRepository.save(user);
-			} catch(NoSuchAlgorithmException ignored) { }
-		}
-	}
-	
 	@GetMapping(path="/")
 	public ResponseEntity<String> getConnectionDetails() {
 		return new ResponseEntity<String>(appName, HttpStatus.ACCEPTED);
 	}
-	
+
 	@GetMapping("/login")
-	public MappingJacksonValue login(@RequestHeader("Authorization") String authorization) {
-		User user = util.getUserFromAuthorization(authorization);
-		return setUserFilter(user);
+	public User login(@RequestHeader("Authorization") String authorization) {
+		User user = authUtil.getUserFromAuthorization(authorization);
+		return user;
 	}
-	
+
 	@GetMapping("/users")
-	public MappingJacksonValue getUsers(@RequestParam(value="type", required=false) String type, @RequestParam(value="value", required=false) String value, Pageable pageable) {
+	public List<User> getUsers(@RequestParam(value="type", required=false) String type, @RequestParam(value="value", required=false) String value, Pageable pageable) {
 		List<User> userList = new ArrayList<User>();
 		if(type!=null && value != null) {
 			switch(type.toUpperCase()) {
@@ -102,78 +60,72 @@ public class UserController {
 		else {
 			userList = userRepository.findAllByOrderByCreatedAtDesc(pageable).getContent();
 		}
-		return setUserFilter(userList);
+		return userList;
 	}
-	
+
 	@GetMapping("/users/{id}")
-	public MappingJacksonValue getUserById(@PathVariable long id) {
+	public User getUserById(@PathVariable long id) {
 		Optional<User> optional = userRepository.findById(id);
 		if(!optional.isPresent()) {
-			throw new ResourceNotFoundException("userId-"+id);
+			throw new NotFoundException("userId-"+id);
 		}
-		
-		MappingJacksonValue user = setUserFilter(optional.get());
-		return user;
+		return optional.get();
 	}
-	
+
 	@GetMapping("/users/{id}/validated")
-	public MappingJacksonValue getValidatedTicketsByUserId(@PathVariable long id) {
+	public List<Ticket> getValidatedTicketsByUserId(@PathVariable long id) {
 		Optional<User> optional = userRepository.findById(id);
 		if(!optional.isPresent()) {
-			throw new ResourceNotFoundException("userId-"+id);
+			throw new NotFoundException("userId-"+id);
 		}
-		
+
 		User user = optional.get();
-		List<Ticket> validatedTickets = user.getValidatedTickets();
-		MappingJacksonValue map = TicketController.setTicketFilters(validatedTickets, true);
-		return map;
+		return user.getValidatedTickets();
 	}
-	
+
 	@GetMapping("/users/{id}/sold")
-	public MappingJacksonValue getSoldTicketsByUserId(@PathVariable long id) {
+	public List<Ticket> getSoldTicketsByUserId(@PathVariable long id) {
 		Optional<User> optional = userRepository.findById(id);
 		if(!optional.isPresent()) {
-			throw new ResourceNotFoundException("userId-"+id);
+			throw new NotFoundException("userId-"+id);
 		}
-		
+
 		User user = optional.get();
-		List<Ticket> soldTickets = user.getSoldTickets();
-		MappingJacksonValue map = TicketController.setTicketFilters(soldTickets, true);
-		return map;
+		return user.getSoldTickets();
 	}
-	
+
 	@PostMapping("/users")
-	public ResponseEntity<MappingJacksonValue> createUser(@Valid @RequestBody User user) {
+	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
 		String username = user.getUsername();
 		String password = user.getPassword();
 		Optional<User> usersWithSameUsername = userRepository.findByUsername(username);
 		if(usersWithSameUsername.isPresent()) {
-			throw new UsernameExistsException("username-"+username);
+			throw new InvalidInputException("username-"+username);
 		}
-		
+
 		user.setCreatedAt(new Date());
-		
+
 		String hashedUserPassword = SpringSecurityConfig.encoder().encode(password);
 		user.setPassword(hashedUserPassword);
 		user.setSoldTicketsNo(0);
 		user.setValidatedTicketsNo(0);
 		userRepository.save(user);
-		
-		return new ResponseEntity<MappingJacksonValue>(setUserFilter(user), HttpStatus.CREATED);
+
+		return new ResponseEntity<User>(user, HttpStatus.CREATED);
 	}
-	
+
 	@PostMapping("/users/{userId}")
-	public MappingJacksonValue editUser(@PathVariable long userId, @Valid @RequestBody User user) {
+	public User editUser(@PathVariable long userId, @Valid @RequestBody User user) {
 		Optional<User> optionalUser = userRepository.findById(userId);
 		if(!optionalUser.isPresent()) {
-			throw new ResourceNotFoundException("User by usedId: " + userId);
+			throw new NotFoundException("User by usedId: " + userId);
 		}
-		
+
 		User existingUser = optionalUser.get();
 		if(user.getRole().equals("ROLE_" + SpringSecurityConfig.ADMIN)) {
-			throw new UnauthorizedRequestException("You can not edit an "+SpringSecurityConfig.ADMIN+" account!");
+			throw new ForbiddenException("You can not edit an " + SpringSecurityConfig.ADMIN + " account!");
 		}
-		
+
 		if(user.getName() != null) {
 			existingUser.setName(user.getName());
 		}
@@ -181,19 +133,19 @@ public class UserController {
 			existingUser.setRole(user.getRole());
 		}
 		userRepository.save(existingUser);
-		return setUserFilter(existingUser);
+		return user;
 	}
-	
+
 	@DeleteMapping("/users/{userId}")
 	public void deleteUser(@PathVariable long userId) {
 		Optional<User> optionalUser = userRepository.findById(userId);
 		if(!optionalUser.isPresent()) {
-			throw new ResourceNotFoundException("User by usedId: " + userId);
+			throw new NotFoundException("User by usedId: " + userId);
 		}
-		
+
 		User user = optionalUser.get();
 		if(user.getRole().equals("ROLE_" + SpringSecurityConfig.ADMIN)) {
-			throw new UnauthorizedRequestException("You can not delete an "+SpringSecurityConfig.ADMIN+" account!");
+			throw new ForbiddenException("You can not delete an " + SpringSecurityConfig.ADMIN + " account!");
 		}
 		for(Ticket ticket : user.getSoldTickets()) {
 			ticket.setSoldBy(null);
@@ -203,17 +155,5 @@ public class UserController {
 		}
 		userRepository.delete(user);
 	}
-	
-	public static MappingJacksonValue setUserFilter(Object userObject) {
-		MappingJacksonValue mapping = new MappingJacksonValue(userObject);
-		SimpleFilterProvider filter = new SimpleFilterProvider().addFilter("UserFilter", getUserFilterProperty());
-		mapping.setFilters(filter);
-		return mapping;
-	}
-	
-	public static SimpleBeanPropertyFilter getUserFilterProperty() {
-		SimpleBeanPropertyFilter filterProperty = SimpleBeanPropertyFilter.filterOutAllExcept("userId","name","role","createdAt","soldTicketsNo","validatedTicketsNo");
-		return filterProperty;
-	}
-	
+
 }

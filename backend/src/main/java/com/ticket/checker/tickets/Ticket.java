@@ -7,10 +7,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-/**
- * @author Daniel Incicau, daniel.incicau@busymachines.com
- * @since 21/03/2019
- */
 @Entity
 @JsonFilter("TicketFilter")
 @Table(name = "tickets")

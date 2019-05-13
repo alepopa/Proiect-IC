@@ -5,10 +5,6 @@ import com.ticket.checker.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Daniel Incicau, daniel.incicau@busymachines.com
- * @since 01/04/2019
- */
 @Component
 public class UserUtil {
 

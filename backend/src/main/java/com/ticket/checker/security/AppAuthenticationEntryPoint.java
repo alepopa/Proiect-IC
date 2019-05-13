@@ -9,10 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * @author Daniel Incicau, daniel.incicau@busymachines.com
- * @since 01/04/2019
- */
 @Component
 public class AppAuthenticationEntryPoint  extends BasicAuthenticationEntryPoint {
 

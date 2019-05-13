@@ -8,10 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.Collection;
 
-/**
- * @author Daniel Incicau, daniel.incicau@busymachines.com
- * @since 01/04/2019
- */
 public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;

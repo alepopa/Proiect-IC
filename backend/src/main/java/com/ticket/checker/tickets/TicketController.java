@@ -25,10 +25,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author Daniel Incicau, daniel.incicau@busymachines.com
- * @since 21/03/2019
- */
 @RestController
 public class TicketController {
 
