@@ -1,1 +1,0 @@
-INSERT INTO users (user_id, username, password, name, role, created_at, sold_tickets_no, validated_tickets_no) VALUES(1001, 'admin','$2a$11$Km8KNBJHd50PWmm1tvxPiuY3Abs2pZppHdtEKTB2YsVkp.VFS/Isa', 'Administrator', 'ROLE_ADMIN', NOW(), 0, 0);

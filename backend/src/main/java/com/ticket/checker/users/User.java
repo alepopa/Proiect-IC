@@ -1,6 +1,5 @@
 package com.ticket.checker.users;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticket.checker.tickets.Ticket;
 
@@ -10,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@JsonFilter("UserFilter")
 @Table(name = "users")
 public class User {
 

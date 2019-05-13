@@ -8,7 +8,6 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
-@JsonFilter("TicketFilter")
 @Table(name = "tickets")
 public class Ticket {
 

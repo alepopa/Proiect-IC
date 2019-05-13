@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,31 @@ public class UserController {
 
 	@Value("${application.name:Ticket Checker}")
 	private String appName;
+
+	@Value("${ticket.checker.admin.username:admin}")
+	private String adminUsername;
+
+	@Value("${ticket.checker.admin.password:admin}")
+	private String adminPassword;
+
+	@PostConstruct
+	public void init(){
+		Optional<User> maybeUser = userRepository.findByUsername(adminUsername);
+		if(!maybeUser.isPresent()) {
+			User user = new User();
+			user.setCreatedAt(new Date());
+
+			String hashedUserPassword = SpringSecurityConfig.encoder().encode(adminPassword);
+
+			user.setUsername(adminUsername);
+			user.setPassword(hashedUserPassword);
+			user.setSoldTicketsNo(0);
+			user.setValidatedTicketsNo(0);
+			user.setName("Administrator");
+			user.setRole("ROLE_" + SpringSecurityConfig.ADMIN);
+			userRepository.save(user);
+		}
+	}
 
 	@GetMapping(path="/")
 	public ResponseEntity<String> getConnectionDetails() {
