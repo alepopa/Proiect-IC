@@ -11,4 +11,8 @@ data class User(var userId : Long?, var username : String, var password : String
         get() = UserType.fromRoleToUserType(role)
 }
 
+data class Ticket(val ticketId : String, val soldTo : String?, val soldBy : User?, val soldAt : Date?, val validatedBy : User?, var validatedAt : Date?)  : Serializable {
+    constructor(ticketId : String, soldTo : String) : this (ticketId, soldTo,null, null, null, null)
+}
+
 data class ErrorResponse(val timestamp : Date, val message : String, val details : String) : Serializable

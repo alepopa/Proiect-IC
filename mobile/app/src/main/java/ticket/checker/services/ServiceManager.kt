@@ -20,6 +20,7 @@ object ServiceManager {
     private var retrofit: Retrofit? = null
 
     private var userService: UserService? = null
+    private var ticketService: TicketService? = null
 
     val errorConverter: Converter<ResponseBody, ErrorResponse>? by lazy {
         retrofit?.responseBodyConverter<ErrorResponse>(ErrorResponse::class.java, emptyArray())
@@ -42,6 +43,13 @@ object ServiceManager {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setDateFormat(GSON_SERIALIZER_DATE_FORMAT).create()))
             .client(httpClient)
         retrofit = builder.build()
+    }
+
+    fun getTicketService(): TicketService {
+        if (ticketService == null) {
+            ticketService = getRetrofitClient().create(TicketService::class.java)
+        }
+        return ticketService as TicketService
     }
 
     fun getUserService(): UserService {
