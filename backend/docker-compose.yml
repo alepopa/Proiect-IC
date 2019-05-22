@@ -12,15 +12,15 @@ services:
       POSTGRES_USER: ticketUser
       POSTGRES_PASSWORD: 123456987asd
 
-#  server:
-#      image: ticket-checker-server:1.0
-#      container_name: ticket-checker-server
-#      build:
-#        context: .
-#      restart: unless-stopped
-#      ports:
-#      - "8080:8080"
-#      links:
-#      - postgres
-#      depends_on:
-#      - postgres
+  server:
+      image: ticket-checker-server:1.0
+      container_name: ticket-checker-server
+      build:
+        context: .
+      restart: unless-stopped
+      ports:
+      - "8080:8080"
+      links:
+      - postgres
+      depends_on:
+      - postgres
