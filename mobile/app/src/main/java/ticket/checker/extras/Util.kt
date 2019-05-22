@@ -14,9 +14,15 @@ import java.util.*
 object Util {
 
     val DATE_FORMAT = SimpleDateFormat("dd MMM yyyy")
+    val DATE_FORMAT_WITH_HOUR = SimpleDateFormat("dd MMM yyyy HH:mm")
 
     const val ERROR_TICKET_VALIDATION = "TicketValidationException"
     const val ERROR_TICKET_EXISTS = "TicketExistsException"
+    const val ERROR_USERNAME_EXISTS = "UsernameExistsException"
+
+    const val CURRENT_USER = "currentUser"
+    const val CURRENT_TICKET = "currentTicket"
+    const val POSITION = "adapterPosition"
 
     class BirthDateFormatException : Exception()
     class BirthDateIncorrectException : Exception()
@@ -122,6 +128,30 @@ object Util {
             }
         }
         return hasResponded
+    }
+
+    fun formatDate(date : Date, shortFormat : Boolean) : String {
+        val then = date.time
+        val now = Date().time
+        val diff = now - then
+
+        return when(diff) {
+            in 0..59999 -> {
+                if(shortFormat) "few seconds ago"  else "Validated a few seconds ago"
+            }
+            in 60000..3599999 -> {
+                if(shortFormat) "${diff/60000} minutes ago"  else "Validated ${diff/60000} minutes ago"
+            }
+            in 3600000..86399999 -> {
+                if(shortFormat) "${diff/3600000} hours ago"  else "Validated ${diff/3600000} hours ago"
+            }
+            in 86400000..604799999 -> {
+                if(shortFormat) "${diff/86400000} days ago"  else "Validated ${diff/86400000} days ago"
+            }
+            else -> {
+                if(shortFormat) DATE_FORMAT.format(date)  else "Validated at " + DATE_FORMAT.format(date)
+            }
+        }
     }
 
 }

@@ -21,6 +21,7 @@ object ServiceManager {
 
     private var userService: UserService? = null
     private var ticketService: TicketService? = null
+    private var statisticsService: StatisticsService? = null
 
     val errorConverter: Converter<ResponseBody, ErrorResponse>? by lazy {
         retrofit?.responseBodyConverter<ErrorResponse>(ErrorResponse::class.java, emptyArray())
@@ -59,9 +60,18 @@ object ServiceManager {
         return userService as UserService
     }
 
+    fun getStatisticsService(): StatisticsService {
+        if (statisticsService == null) {
+            statisticsService = getRetrofitClient().create(StatisticsService::class.java)
+        }
+        return statisticsService as StatisticsService
+    }
+
     fun invalidateSession() {
         retrofit = null
         userService = null
+        ticketService = null
+        statisticsService = null
 
         currentUsername = ""
         currentPassword = ""
