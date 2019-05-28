@@ -150,8 +150,7 @@ class DialogAddUser : DialogFragment(), View.OnClickListener {
         submitButton?.visibility = View.GONE
         loadingSpinner?.visibility = View.VISIBLE
 
-        val encryptedPassword = hashString("SHA-256", password)
-        val user = User(username, encryptedPassword, name , userType)
+        val user = User(username, password, name , userType)
         val call = ServiceManager.getUserService().createUser(user)
         call.enqueue(submitCallback)
     }

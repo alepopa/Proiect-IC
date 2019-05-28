@@ -49,12 +49,6 @@ class ActivityTicketDetails : AppCompatActivity(), View.OnClickListener, DialogI
     private val tvSoldTo: TextView by lazy {
         findViewById<TextView>(R.id.soldTo)
     }
-    private val tvSoldToBirthDate : TextView  by lazy {
-        findViewById<TextView>(R.id.soldToBirthDate)
-    }
-    private val tvSoldToTelephone : TextView  by lazy {
-        findViewById<TextView>(R.id.soldToTelephone)
-    }
     private val tvSoldAt: TextView by lazy {
         findViewById<TextView>(R.id.soldAt)
     }
@@ -224,8 +218,6 @@ class ActivityTicketDetails : AppCompatActivity(), View.OnClickListener, DialogI
 
     private fun updateTicketInfo(ticket: Ticket) {
         findViewById<ProgressBar>(R.id.lsSoldTo).visibility = View.INVISIBLE
-        findViewById<ProgressBar>(R.id.lsSoldToBirthDate).visibility = View.INVISIBLE
-        findViewById<ProgressBar>(R.id.lsSoldToTelephone).visibility = View.INVISIBLE
         findViewById<ProgressBar>(R.id.lsSoldAt).visibility = View.INVISIBLE
         findViewById<ProgressBar>(R.id.lsSoldBy).visibility = View.INVISIBLE
         findViewById<ProgressBar>(R.id.lsValidatedAt).visibility = View.INVISIBLE

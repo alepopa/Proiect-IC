@@ -213,10 +213,10 @@ class ActivityMenu : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-//            R.id.controlPanel -> {
-//                val intent = Intent(this, ActivityControlPanel::class.java)
-//                startActivity(intent)
-//            }
+            R.id.controlPanel -> {
+                val intent = Intent(this, ActivityControlPanel::class.java)
+                startActivity(intent)
+            }
             R.id.scan -> {
                 val intent = Intent(this, ActivityScan::class.java)
                 startActivity(intent)

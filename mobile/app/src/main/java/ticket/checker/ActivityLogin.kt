@@ -37,8 +37,7 @@ class ActivityLogin : AppCompatActivity(), View.OnClickListener {
             btnLogin.isClickable = true
             if(response.isSuccessful) {
                 if(autoLoginCheckBox.isChecked) {
-                    val encryptedPass = Util.hashString("SHA-256",savedPass)
-                    AppTicketChecker.saveSession(savedUser, encryptedPass)
+                    AppTicketChecker.saveSession(savedUser, savedPass)
                     savedUser = ""
                     savedPass = ""
                 }
@@ -134,7 +133,7 @@ class ActivityLogin : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun doLogin(username: String, password: String) {
-        ServiceManager.createSession(username, password, true)
+        ServiceManager.createSession(username, password, false)
         if(autoLoginCheckBox.isChecked) {
             savedUser = username
             savedPass = password
