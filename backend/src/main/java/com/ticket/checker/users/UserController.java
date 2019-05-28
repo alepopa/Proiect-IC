@@ -148,7 +148,7 @@ public class UserController {
 		}
 
 		User existingUser = optionalUser.get();
-		if(user.getRole().equals("ROLE_" + SpringSecurityConfig.ADMIN)) {
+		if(existingUser.getRole().equals("ROLE_" + SpringSecurityConfig.ADMIN)) {
 			throw new ForbiddenException("You can not edit an " + SpringSecurityConfig.ADMIN + " account!");
 		}
 
@@ -159,7 +159,7 @@ public class UserController {
 			existingUser.setRole(user.getRole());
 		}
 		userRepository.save(existingUser);
-		return user;
+		return existingUser;
 	}
 
 	@DeleteMapping("/users/{userId}")
