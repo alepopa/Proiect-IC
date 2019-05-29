@@ -33,7 +33,6 @@ class DialogScan : DialogFragment(), View.OnClickListener {
 
     private var ticketNumber: String? = null
     private var isTicketValidated : Boolean = false
-    private var birthDate : Date? = null
 
     private var tvTicketNumber: TextView? = null
     private var tvOwnerName : TextView? = null
@@ -47,8 +46,6 @@ class DialogScan : DialogFragment(), View.OnClickListener {
     private var tvDescription: TextView? = null
     private var btnClose: ImageButton? = null
     private var etSoldTo: EditText? = null
-    private var etSoldToBirthDate: EditText? = null
-    private var etSoldToTelephone: EditText? = null
     private var btnAdd: Button? = null
     private var btnValidate: Button? = null
     private var btnDelete: Button? = null
@@ -145,7 +142,6 @@ class DialogScan : DialogFragment(), View.OnClickListener {
                 if(validatedAdd()) {
                     showLoading()
                     val soldTo = etSoldTo?.text?.toString() ?: ""
-                    val telephone = etSoldToTelephone?.text?.toString()
                     val ticket = Ticket(ticketNumber as String, soldTo)
                     val call = ServiceManager.getTicketService().createTicket(ticket)
                     call.enqueue(verificationCallback as Callback<Ticket>)
@@ -242,20 +238,6 @@ class DialogScan : DialogFragment(), View.OnClickListener {
             isValid = false
         }
 
-        val birthDateString = etSoldToBirthDate?.text.toString()
-        if(!birthDateString.isEmpty()) {
-            try {
-                birthDate = Util.getBirthdateFromText(birthDateString)
-            }
-            catch(e : Util.BirthDateIncorrectException) {
-                etSoldToBirthDate?.error = "The birth date cannot be in the future"
-                isValid = false
-            }
-            catch(e : Util.BirthDateFormatException) {
-                etSoldToBirthDate?.error =  "Not valid date format. (dd.mm.yyyy)"
-                isValid = false
-            }
-        }
         return isValid
     }
 
